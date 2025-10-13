@@ -17,25 +17,29 @@ const AdminDashboard = () => {
       title: "Faculty Management",
       description: "Create accounts, assign roles, and manage faculty",
       icon: Users,
-      path: "/admin/faculty"
+      path: "/admin/faculty",
+      available: true
     },
     {
       title: "Student Management",
       description: "View and manage student records and attendance",
       icon: GraduationCap,
-      path: "/admin/students"
+      path: "/admin/students",
+      available: true
     },
     {
       title: "Reports & Analytics",
       description: "Generate attendance reports and analytics",
       icon: FileText,
-      path: "/admin/reports"
+      path: "/admin/reports",
+      available: false
     },
     {
       title: "System Settings",
       description: "Configure system settings and preferences",
       icon: Settings,
-      path: "/admin/settings"
+      path: "/admin/settings",
+      available: false
     }
   ];
 
@@ -91,15 +95,24 @@ const AdminDashboard = () => {
               {managementOptions.map((option, index) => (
                 <Card 
                   key={index}
-                  className="border-2 hover:border-primary transition-smooth cursor-pointer group"
-                  onClick={() => navigate(option.path)}
+                  className={`border-2 transition-smooth group ${
+                    option.available 
+                      ? 'hover:border-primary cursor-pointer' 
+                      : 'opacity-60 cursor-not-allowed'
+                  }`}
+                  onClick={() => option.available && navigate(option.path)}
                 >
                   <div className="p-6 space-y-3">
-                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-bounce">
+                    <div className={`w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center ${
+                      option.available ? 'group-hover:scale-110 transition-bounce' : ''
+                    }`}>
                       <option.icon className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold mb-1">{option.title}</h3>
+                      <h3 className="text-xl font-semibold mb-1">
+                        {option.title}
+                        {!option.available && <span className="text-xs ml-2 text-muted-foreground">(Coming Soon)</span>}
+                      </h3>
                       <p className="text-sm text-muted-foreground">{option.description}</p>
                     </div>
                   </div>

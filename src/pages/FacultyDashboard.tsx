@@ -74,7 +74,10 @@ const FacultyDashboard = () => {
                           <p className="text-sm"><span className="font-medium">Class:</span> {classItem.class}</p>
                           <p className="text-sm"><span className="font-medium">Subject:</span> {classItem.subject}</p>
                         </div>
-                        <Button className="gradient-primary">
+                        <Button 
+                          className="gradient-primary"
+                          onClick={() => navigate("/faculty/attendance-marking")}
+                        >
                           <ClipboardList className="w-4 h-4 mr-2" />
                           Take Attendance
                         </Button>
@@ -94,7 +97,11 @@ const FacultyDashboard = () => {
                 <p className="text-muted-foreground">Managing: {facultyData.advisorClass}</p>
                 
                 <div className="grid md:grid-cols-2 gap-4 pt-4">
-                  <Button size="lg" className="h-24 flex flex-col gap-2">
+                  <Button 
+                    size="lg" 
+                    className="h-24 flex flex-col gap-2"
+                    onClick={() => navigate("/faculty/timetable-management")}
+                  >
                     <Calendar className="w-6 h-6" />
                     <span>Manage Timetable</span>
                   </Button>
