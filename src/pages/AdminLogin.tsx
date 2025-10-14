@@ -6,29 +6,34 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Shield } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       toast.error("Please fill in all fields");
       return;
     }
 
     setLoading(true);
-    
-    // Simulate login - In real app, this would authenticate with backend
-    setTimeout(() => {
+
+    const { error } = await signIn(email, password);
+
+    if (error) {
+      toast.error(error.message || "Invalid credentials");
+      setLoading(false);
+    } else {
       toast.success("Login successful!");
       navigate("/admin-dashboard");
-      setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -72,6 +77,7 @@ const AdminLogin = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <p className="text-xs text-muted-foreground">Default password: Admin@123</p>
             </div>
 
             <Button 
