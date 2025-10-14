@@ -14,16 +14,353 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      advisor_substitutions: {
+        Row: {
+          class_id: string
+          created_at: string | null
+          created_by: string | null
+          from_date: string
+          id: string
+          original_advisor_id: string
+          substitute_advisor_id: string
+          to_date: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string | null
+          created_by?: string | null
+          from_date: string
+          id?: string
+          original_advisor_id: string
+          substitute_advisor_id: string
+          to_date: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          from_date?: string
+          id?: string
+          original_advisor_id?: string
+          substitute_advisor_id?: string
+          to_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advisor_substitutions_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advisor_substitutions_original_advisor_id_fkey"
+            columns: ["original_advisor_id"]
+            isOneToOne: false
+            referencedRelation: "faculty"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advisor_substitutions_substitute_advisor_id_fkey"
+            columns: ["substitute_advisor_id"]
+            isOneToOne: false
+            referencedRelation: "faculty"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attendance_records: {
+        Row: {
+          class_id: string
+          date: string
+          faculty_id: string | null
+          id: string
+          marked_at: string | null
+          marked_by: string | null
+          modified_at: string | null
+          modified_by: string | null
+          period_number: number
+          status: string
+          student_id: string
+          subject: string | null
+        }
+        Insert: {
+          class_id: string
+          date?: string
+          faculty_id?: string | null
+          id?: string
+          marked_at?: string | null
+          marked_by?: string | null
+          modified_at?: string | null
+          modified_by?: string | null
+          period_number: number
+          status: string
+          student_id: string
+          subject?: string | null
+        }
+        Update: {
+          class_id?: string
+          date?: string
+          faculty_id?: string | null
+          id?: string
+          marked_at?: string | null
+          marked_by?: string | null
+          modified_at?: string | null
+          modified_by?: string | null
+          period_number?: number
+          status?: string
+          student_id?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_records_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_records_faculty_id_fkey"
+            columns: ["faculty_id"]
+            isOneToOne: false
+            referencedRelation: "faculty"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_records_marked_by_fkey"
+            columns: ["marked_by"]
+            isOneToOne: false
+            referencedRelation: "faculty"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_records_modified_by_fkey"
+            columns: ["modified_by"]
+            isOneToOne: false
+            referencedRelation: "faculty"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_records_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classes: {
+        Row: {
+          class_name: string
+          created_at: string | null
+          department: string
+          id: string
+          section: string
+          year: number
+        }
+        Insert: {
+          class_name: string
+          created_at?: string | null
+          department: string
+          id?: string
+          section: string
+          year: number
+        }
+        Update: {
+          class_name?: string
+          created_at?: string | null
+          department?: string
+          id?: string
+          section?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      faculty: {
+        Row: {
+          advisor_class_id: string | null
+          created_at: string | null
+          department: string | null
+          email: string
+          full_name: string
+          id: string
+          is_class_advisor: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          advisor_class_id?: string | null
+          created_at?: string | null
+          department?: string | null
+          email: string
+          full_name: string
+          id?: string
+          is_class_advisor?: boolean | null
+          user_id?: string | null
+        }
+        Update: {
+          advisor_class_id?: string | null
+          created_at?: string | null
+          department?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          is_class_advisor?: boolean | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faculty_advisor_class_id_fkey"
+            columns: ["advisor_class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      students: {
+        Row: {
+          class_id: string | null
+          created_at: string | null
+          full_name: string
+          id: string
+          roll_number: string
+          user_id: string | null
+        }
+        Insert: {
+          class_id?: string | null
+          created_at?: string | null
+          full_name: string
+          id?: string
+          roll_number: string
+          user_id?: string | null
+        }
+        Update: {
+          class_id?: string | null
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          roll_number?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      timetable: {
+        Row: {
+          class_id: string
+          created_at: string | null
+          day_of_week: number
+          faculty_id: string | null
+          id: string
+          period_number: number
+          subject: string
+          updated_at: string | null
+        }
+        Insert: {
+          class_id: string
+          created_at?: string | null
+          day_of_week: number
+          faculty_id?: string | null
+          id?: string
+          period_number: number
+          subject: string
+          updated_at?: string | null
+        }
+        Update: {
+          class_id?: string
+          created_at?: string | null
+          day_of_week?: number
+          faculty_id?: string | null
+          id?: string
+          period_number?: number
+          subject?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "timetable_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timetable_faculty_id_fkey"
+            columns: ["faculty_id"]
+            isOneToOne: false
+            referencedRelation: "faculty"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "faculty" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +487,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "faculty", "student"],
+    },
   },
 } as const
