@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Users, Shield } from "lucide-react";
-import attendoLogo from "@/assets/attendo-logo.png";
+import { GraduationCap, Users, Shield, BookOpen } from "lucide-react";
 
 const LoginSelection = () => {
   const navigate = useNavigate();
@@ -37,7 +36,9 @@ const LoginSelection = () => {
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="flex justify-center mb-4">
-            <img src={attendoLogo} alt="Attendo" className="w-20 h-20" />
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg">
+              <BookOpen className="w-12 h-12 text-white" />
+            </div>
           </div>
           <h1 className="text-4xl font-bold text-foreground">Welcome to Attendo</h1>
           <p className="text-lg text-muted-foreground">Choose your login portal to continue</p>
