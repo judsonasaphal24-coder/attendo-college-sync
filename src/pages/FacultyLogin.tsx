@@ -6,34 +6,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Users } from "lucide-react";
 import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
 
 const FacultyLogin = () => {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (!email || !password) {
       toast.error("Please fill in all fields");
       return;
     }
 
     setLoading(true);
-
-    const { error } = await signIn(email, password);
-
-    if (error) {
-      toast.error(error.message || "Invalid credentials");
-      setLoading(false);
-    } else {
+    
+    // Simulate login - In real app, this would authenticate with backend
+    setTimeout(() => {
       toast.success("Login successful!");
       navigate("/faculty-dashboard");
-    }
+      setLoading(false);
+    }, 1000);
   };
 
   return (
@@ -77,7 +72,6 @@ const FacultyLogin = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <p className="text-xs text-muted-foreground">Default password: Faculty@123</p>
             </div>
 
             <Button 
