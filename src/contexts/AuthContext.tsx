@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { authService } from "@/services/authService";
+import { studentService } from "@/services/studentService";
+import { facultyService } from "@/services/facultyService";
 
 interface AuthContextType {
   user: User | null;
@@ -20,7 +22,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    authService.getSession().then((session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchUserData(session.user.id);
@@ -29,7 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = authService.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchUserData(session.user.id);
@@ -45,35 +47,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchUserData = async (userId: string) => {
     try {
-      const { data: roleData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .maybeSingle();
+      const role = await authService.getUserRole(userId);
+      setUserRole(role);
 
-      setUserRole(roleData?.role || null);
-
-      if (roleData?.role === "student") {
-        const { data: studentData } = await supabase
-          .from("students")
-          .select("*, classes(*)")
-          .eq("user_id", userId)
-          .maybeSingle();
+      if (role === "student") {
+        const studentData = await studentService.getStudentProfile(userId);
         setUserProfile(studentData);
-      } else if (roleData?.role === "faculty") {
-        const { data: facultyData } = await supabase
-          .from("faculty")
-          .select("*, classes:advisor_class_id(*)")
-          .eq("user_id", userId)
-          .maybeSingle();
+      } else if (role === "faculty") {
+        const facultyData = await facultyService.getFacultyProfile(userId);
         setUserProfile(facultyData);
-      } else if (roleData?.role === "admin") {
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", userId)
-          .maybeSingle();
-        setUserProfile(profileData);
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -83,15 +65,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
+    try {
+      await authService.signIn(email, password);
+      return { error: null };
+    } catch (error) {
+      return { error };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await authService.signOut();
     setUser(null);
     setUserRole(null);
     setUserProfile(null);

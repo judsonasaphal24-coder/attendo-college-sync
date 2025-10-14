@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import attendoLogo from "@/assets/attendo-logo.png";
-import collegeBanner from "@/assets/college-banner.jpg";
+import { BookOpen, GraduationCap } from "lucide-react";
 
 const Splash = () => {
   const navigate = useNavigate();
@@ -23,23 +22,10 @@ const Splash = () => {
       </div>
 
       <div className="relative z-10 text-center space-y-8 animate-in fade-in zoom-in duration-700">
-        {/* College Banner */}
-        <div className="mb-8 rounded-2xl overflow-hidden shadow-large mx-auto max-w-2xl">
-          <img 
-            src={collegeBanner} 
-            alt="College Banner" 
-            className="w-full h-48 object-cover"
-          />
-        </div>
-
         {/* App Logo */}
         <div className="flex justify-center">
-          <div className="bg-white p-6 rounded-3xl shadow-large transition-smooth hover:scale-105">
-            <img 
-              src={attendoLogo} 
-              alt="Attendo Logo" 
-              className="w-32 h-32"
-            />
+          <div className="bg-white p-8 rounded-3xl shadow-large transition-smooth hover:scale-105">
+            <BookOpen className="w-32 h-32 text-blue-600" />
           </div>
         </div>
 
