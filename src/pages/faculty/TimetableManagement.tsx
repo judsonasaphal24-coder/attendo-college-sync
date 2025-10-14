@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save, Edit } from "lucide-react";
@@ -26,29 +27,83 @@ const TimetableManagement = () => {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const periods = [1, 2, 3, 4, 5, 6, 7];
   
-  // Mock faculty list
-  const facultyList = [
-    "Dr. Sarah Johnson",
-    "Prof. Michael Chen",
-    "Dr. Emily Davis",
-    "Prof. Robert Wilson",
-    "Dr. Lisa Anderson"
-  ];
+  const [facultyList, setFacultyList] = useState<string[]>([]);
 
-  // Mock timetable data
-  const [timetable, setTimetable] = useState<Period[]>([
-    { day: "Monday", period: 1, subject: "Data Structures", faculty: "Dr. Sarah Johnson" },
-    { day: "Monday", period: 2, subject: "Database Management", faculty: "Prof. Michael Chen" },
-    { day: "Monday", period: 3, subject: "Operating Systems", faculty: "Dr. Emily Davis" },
-    { day: "Tuesday", period: 1, subject: "Computer Networks", faculty: "Prof. Robert Wilson" },
-    { day: "Tuesday", period: 2, subject: "Web Technologies", faculty: "Dr. Lisa Anderson" },
-  ]);
+  useEffect(() => {
+    // Fetch faculty names from Supabase
+    supabase
+      .from("faculty")
+      .select("full_name")
+      .then(({ data }) => {
+        if (data) {
+          setFacultyList(data.map((f: any) => f.full_name));
+        }
+      });
+  }, []);
+
+  const [timetable, setTimetable] = useState<Period[]>([]);
+
+  // Fetch timetable from Supabase on mount
+  useEffect(() => {
+    supabase
+      .from("timetable")
+      .select("day_of_week,period_number,subject,faculty_id")
+      .then(async ({ data }) => {
+        if (data) {
+          // Get faculty names for each faculty_id
+          const facultyMap: Record<string, string> = {};
+          const facultyIds = Array.from(new Set(data.map((item: any) => item.faculty_id).filter(Boolean)));
+          if (facultyIds.length > 0) {
+            const { data: facultyData } = await supabase
+              .from("faculty")
+              .select("id,full_name")
+              .in("id", facultyIds);
+            if (facultyData) {
+              facultyData.forEach((f: any) => {
+                facultyMap[f.id] = f.full_name;
+              });
+            }
+          }
+          setTimetable(
+            data.map((item: any) => ({
+              day: ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][item.day_of_week],
+              period: item.period_number,
+              subject: item.subject,
+              faculty: facultyMap[item.faculty_id] || ""
+            }))
+          );
+        }
+      });
+  }, [isEditing]);
 
   const getPeriodData = (day: string, period: number) => {
     return timetable.find(t => t.day === day && t.period === period);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // Save timetable to Supabase
+    for (const period of timetable) {
+      // Find faculty_id by name
+      let facultyId = null;
+      if (period.faculty) {
+        const { data: facultyData } = await supabase
+          .from("faculty")
+          .select("id")
+          .eq("full_name", period.faculty)
+          .single();
+        facultyId = facultyData?.id || null;
+      }
+      // Upsert timetable entry
+      await supabase
+        .from("timetable")
+        .upsert({
+          class_id: "CLASS_ID_PLACEHOLDER", // TODO: Replace with actual class_id for the managed class
+          day_of_week: ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"].indexOf(period.day),
+          period_number: period.period,
+          subject: period.subject,
+          faculty_id: facultyId
+  }, { onConflict: "class_id,day_of_week,period_number" });
+    }
     toast.success("Timetable saved successfully!");
     setIsEditing(false);
   };

@@ -3,9 +3,18 @@ import { Button } from "@/components/ui/button";
 import { LogOut, User, Book } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@/components/CircularProgress";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        navigate("/student-login");
+      }
+    });
+  }, [navigate]);
 
   // Mock student data - In real app, this would come from backend
   const studentData = {

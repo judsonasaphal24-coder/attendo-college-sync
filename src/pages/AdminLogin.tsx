@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,12 +24,35 @@ const AdminLogin = () => {
 
     setLoading(true);
     
-    // Simulate login - In real app, this would authenticate with backend
-    setTimeout(() => {
-      toast.success("Login successful!");
-      navigate("/admin-dashboard");
+    // Supabase Auth login
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      toast.error(error.message);
       setLoading(false);
-    }, 1000);
+      return;
+    }
+    // Get user role and route accordingly
+    const user = await supabase.auth.getUser();
+    if (user.data.user) {
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.data.user.id)
+        .single();
+      if (roleData?.role === "admin") {
+        navigate("/admin-dashboard");
+      } else if (roleData?.role === "faculty") {
+        navigate("/faculty-dashboard");
+      } else if (roleData?.role === "student") {
+        navigate("/student-dashboard");
+      } else {
+        toast.error("No valid role found");
+      }
+    }
+    setLoading(false);
   };
 
   return (
