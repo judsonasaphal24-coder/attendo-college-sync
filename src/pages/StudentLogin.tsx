@@ -6,34 +6,34 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
+import attendoLogo from "@/assets/attendo-logo.png";
 
 const StudentLogin = () => {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
-  const [email, setEmail] = useState("");
+  const [rollNumber, setRollNumber] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!email || !password) {
+    
+    if (!rollNumber || !password) {
       toast.error("Please fill in all fields");
       return;
     }
 
     setLoading(true);
-
-    const { error } = await signIn(email, password);
-
-    if (error) {
-      toast.error(error.message || "Invalid credentials");
+    
+    // Simulate login - In real app, this would authenticate with backend
+    setTimeout(() => {
+      if (password === "Student@123") {
+        toast.success("Login successful!");
+        navigate("/student-dashboard");
+      } else {
+        toast.error("Invalid credentials");
+      }
       setLoading(false);
-    } else {
-      toast.success("Login successful!");
-      navigate("/student-dashboard");
-    }
+    }, 1000);
   };
 
   return (
@@ -56,13 +56,13 @@ const StudentLogin = () => {
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email (Roll Number@college.edu)</Label>
+              <Label htmlFor="rollNumber">Roll Number</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="21CS001@college.edu"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="rollNumber"
+                type="text"
+                placeholder="Enter your roll number"
+                value={rollNumber}
+                onChange={(e) => setRollNumber(e.target.value)}
                 required
               />
             </div>
@@ -72,12 +72,11 @@ const StudentLogin = () => {
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Student@123"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <p className="text-xs text-muted-foreground">Default password: Student@123</p>
             </div>
 
             <Button 
