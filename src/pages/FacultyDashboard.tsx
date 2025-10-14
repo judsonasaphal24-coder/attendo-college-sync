@@ -1,84 +1,30 @@
-import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LogOut, Calendar, ClipboardList, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 
 const FacultyDashboard = () => {
   const navigate = useNavigate();
-  const { user, userProfile, signOut, loading: authLoading } = useAuth();
-  const [todayClasses, setTodayClasses] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate("/faculty-login");
-      return;
-    }
-
-    if (userProfile) {
-      fetchTodaySchedule();
-    }
-  }, [user, userProfile, authLoading]);
-
-  const fetchTodaySchedule = async () => {
-    if (!userProfile?.id) return;
-
-    try {
-      const today = new Date().getDay();
-
-      const { data } = await supabase
-        .from("timetable")
-        .select("*, classes(class_name, year, section)")
-        .eq("faculty_id", userProfile.id)
-        .eq("day_of_week", today)
-        .order("period_number");
-
-      setTodayClasses(data || []);
-    } catch (error) {
-      console.error("Error fetching schedule:", error);
-    } finally {
-      setLoading(false);
-    }
+  // Mock faculty data
+  const facultyData = {
+    name: "Dr. Sarah Johnson",
+    email: "sarah.johnson@college.edu",
+    isClassAdvisor: true,
+    advisorClass: "3rd Year - CSE A"
   };
 
-  const handleLogout = async () => {
-    await signOut();
-    navigate("/login-selection");
-  };
-
-  const handleTakeAttendance = (classData: any) => {
-    navigate("/faculty/attendance-marking", {
-      state: {
-        classId: classData.class_id,
-        className: classData.classes?.class_name,
-        period: classData.period_number,
-        subject: classData.subject,
-      },
-    });
-  };
-
-  if (authLoading || loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-lg">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!userProfile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-lg">No profile found</p>
-      </div>
-    );
-  }
+  // Mock timetable
+  const todayClasses = [
+    { period: 1, time: "09:00 - 10:00", class: "2nd Year CSE B", subject: "Data Structures" },
+    { period: 3, time: "11:00 - 12:00", class: "3rd Year CSE A", subject: "Database Management" },
+    { period: 5, time: "02:00 - 03:00", class: "2nd Year CSE A", subject: "Data Structures" }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
+      {/* Header */}
       <header className="border-b bg-card shadow-soft">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -87,10 +33,13 @@ const FacultyDashboard = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold">Faculty Portal</h1>
-              <p className="text-sm text-muted-foreground">Welcome, {userProfile.full_name}</p>
+              <p className="text-sm text-muted-foreground">Welcome, {facultyData.name}</p>
             </div>
           </div>
-          <Button variant="ghost" onClick={handleLogout}>
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate("/login-selection")}
+          >
             <LogOut className="w-4 h-4 mr-2" />
             Logout
           </Button>
@@ -101,65 +50,55 @@ const FacultyDashboard = () => {
         <Tabs defaultValue="teaching" className="space-y-4">
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="teaching">Teaching Faculty</TabsTrigger>
-            <TabsTrigger value="advisor" disabled={!userProfile.is_class_advisor}>
+            <TabsTrigger value="advisor" disabled={!facultyData.isClassAdvisor}>
               Class Advisor
             </TabsTrigger>
           </TabsList>
 
+          {/* Teaching Faculty Tab */}
           <TabsContent value="teaching" className="space-y-6">
+            {/* Today's Schedule */}
             <Card className="shadow-medium">
               <div className="p-6 space-y-4">
                 <h2 className="text-2xl font-bold flex items-center gap-2">
                   <Calendar className="w-6 h-6 text-primary" />
                   Today's Schedule
                 </h2>
-                {todayClasses.length === 0 ? (
-                  <p className="text-muted-foreground">No classes scheduled for today</p>
-                ) : (
-                  <div className="space-y-3">
-                    {todayClasses.map((classItem) => (
-                      <Card
-                        key={classItem.id}
-                        className="border-2 hover:border-primary transition-smooth"
-                      >
-                        <div className="p-4 flex items-center justify-between">
-                          <div className="space-y-1">
-                            <p className="font-semibold text-lg">Period {classItem.period_number}</p>
-                            <p className="text-sm">
-                              <span className="font-medium">Class:</span>{" "}
-                              {classItem.classes?.class_name}
-                            </p>
-                            <p className="text-sm">
-                              <span className="font-medium">Subject:</span> {classItem.subject}
-                            </p>
-                          </div>
-                          <Button
-                            className="gradient-primary"
-                            onClick={() => handleTakeAttendance(classItem)}
-                          >
-                            <ClipboardList className="w-4 h-4 mr-2" />
-                            Take Attendance
-                          </Button>
+                <div className="space-y-3">
+                  {todayClasses.map((classItem) => (
+                    <Card key={classItem.period} className="border-2 hover:border-primary transition-smooth">
+                      <div className="p-4 flex items-center justify-between">
+                        <div className="space-y-1">
+                          <p className="font-semibold text-lg">Period {classItem.period}</p>
+                          <p className="text-sm text-muted-foreground">{classItem.time}</p>
+                          <p className="text-sm"><span className="font-medium">Class:</span> {classItem.class}</p>
+                          <p className="text-sm"><span className="font-medium">Subject:</span> {classItem.subject}</p>
                         </div>
-                      </Card>
-                    ))}
-                  </div>
-                )}
+                        <Button 
+                          className="gradient-primary"
+                          onClick={() => navigate("/faculty/attendance-marking")}
+                        >
+                          <ClipboardList className="w-4 h-4 mr-2" />
+                          Take Attendance
+                        </Button>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
               </div>
             </Card>
           </TabsContent>
 
+          {/* Class Advisor Tab */}
           <TabsContent value="advisor" className="space-y-6">
             <Card className="shadow-medium">
               <div className="p-6 space-y-4">
                 <h2 className="text-2xl font-bold">Class Advisor Dashboard</h2>
-                <p className="text-muted-foreground">
-                  Managing: {userProfile.classes?.class_name || "No class assigned"}
-                </p>
-
+                <p className="text-muted-foreground">Managing: {facultyData.advisorClass}</p>
+                
                 <div className="grid md:grid-cols-2 gap-4 pt-4">
-                  <Button
-                    size="lg"
+                  <Button 
+                    size="lg" 
                     className="h-24 flex flex-col gap-2"
                     onClick={() => navigate("/faculty/timetable-management")}
                   >
