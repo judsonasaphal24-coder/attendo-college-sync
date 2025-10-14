@@ -52,11 +52,27 @@ const FacultyDashboard = () => {
       }
       // Get today's classes for faculty
       const today = new Date();
-      const dayOfWeek = today.getDay(); // 0=Sunday, 1=Monday, ...
+      let dayOfWeek = today.getDay(); // 0=Sunday, 1=Monday, ...
+      // Our DB uses 1=Monday, ..., 6=Saturday. If Sunday, show empty schedule.
+      if (dayOfWeek === 0) {
+        setTodayClasses([]);
+        return;
+      }
+      // Get faculty details by user_id
+      const { data: facultyRow } = await supabase
+        .from("faculty")
+        .select("id")
+        .eq("user_id", data.session.user.id)
+        .single();
+      const facultyId = facultyRow?.id;
+      if (!facultyId) {
+        setTodayClasses([]);
+        return;
+      }
       const { data: timetable } = await supabase
         .from("timetable")
         .select("period_number,class_id,subject")
-        .eq("faculty_id", data.session.user.id)
+        .eq("faculty_id", facultyId)
         .eq("day_of_week", dayOfWeek)
         .order("period_number", { ascending: true });
       // Get class names for each class_id
