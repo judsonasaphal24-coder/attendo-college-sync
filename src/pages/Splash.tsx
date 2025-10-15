@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import attendoLogo from "@/assets/attendo-logo.png";
-import collegeBanner from "@/assets/college-banner.jpg";
+import newAttendoLogo from "@/assets/300372602_367089768961179_2671218216233570040_n.png";
+import krctImage from "@/assets/krct image.jpg";
 
 const Splash = () => {
   const navigate = useNavigate();
@@ -23,28 +23,31 @@ const Splash = () => {
       </div>
 
       <div className="relative z-10 text-center space-y-8 animate-in fade-in zoom-in duration-700">
-        {/* College Banner */}
+        {/* College Banner - replaced with KRCT image */}
         <div className="mb-8 rounded-2xl overflow-hidden shadow-large mx-auto max-w-2xl">
           <img 
-            src={collegeBanner} 
-            alt="College Banner" 
+            src={krctImage} 
+            alt="KRCT College" 
             className="w-full h-48 object-cover"
           />
         </div>
 
-        {/* App Logo */}
+        {/* App Logo - replaced with new image */}
         <div className="flex justify-center">
           <div className="bg-white p-6 rounded-3xl shadow-large transition-smooth hover:scale-105">
             <img 
-              src={attendoLogo} 
-              alt="Attendo Logo" 
-              className="w-32 h-32"
+              src={newAttendoLogo} 
+              alt="Attendo App Logo" 
+              className="w-32 h-32 object-cover"
             />
           </div>
         </div>
 
-        {/* App Name */}
+        {/* College Name and App Name */}
         <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-white tracking-wide mb-2">
+            K. RAMAKRISHNAN COLLEGE OF TECHNOLOGY
+          </h2>
           <h1 className="text-6xl font-bold text-white tracking-tight">
             Attendo
           </h1>
