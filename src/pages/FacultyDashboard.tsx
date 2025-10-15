@@ -182,7 +182,12 @@ const FacultyDashboard = () => {
                     <Calendar className="w-6 h-6" />
                     <span>Manage Timetable</span>
                   </Button>
-                  <Button size="lg" className="h-24 flex flex-col gap-2" variant="secondary">
+                  <Button
+                    size="lg"
+                    className="h-24 flex flex-col gap-2"
+                    variant="secondary"
+                    onClick={() => navigate("/faculty/attendance-reports")}
+                  >
                     <ClipboardList className="w-6 h-6" />
                     <span>View Attendance Reports</span>
                   </Button>

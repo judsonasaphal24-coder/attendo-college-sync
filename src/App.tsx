@@ -15,6 +15,7 @@ import FacultyManagement from "./pages/admin/FacultyManagement";
 import StudentManagement from "./pages/admin/StudentManagement";
 import AttendanceMarking from "./pages/faculty/AttendanceMarking";
 import TimetableManagement from "./pages/faculty/TimetableManagement";
+import AttendanceReports from "./pages/faculty/AttendanceReports";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/admin/students" element={<StudentManagement />} />
           <Route path="/faculty/attendance-marking" element={<AttendanceMarking />} />
           <Route path="/faculty/timetable-management" element={<TimetableManagement />} />
+          <Route path="/faculty/attendance-reports" element={<AttendanceReports />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
