@@ -3,101 +3,24 @@ import { Button } from "@/components/ui/button";
 import { LogOut, Calendar, ClipboardList, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 const FacultyDashboard = () => {
   const navigate = useNavigate();
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) {
-        navigate("/faculty-login");
-      }
-    });
-  }, [navigate]);
 
-  const [facultyData, setFacultyData] = useState<any>(null);
-  const [todayClasses, setTodayClasses] = useState<any[]>([]);
+  // Mock faculty data
+  const facultyData = {
+    name: "Dr. Sarah Johnson",
+    email: "sarah.johnson@college.edu",
+    isClassAdvisor: true,
+    advisorClass: "3rd Year - CSE A"
+  };
 
-  useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!data.session) {
-        navigate("/faculty-login");
-        return;
-      }
-      // Get faculty details by user_id
-      const { data: faculty, error } = await supabase
-        .from("faculty")
-        .select("full_name,email,is_class_advisor,advisor_class_id,department")
-        .eq("user_id", data.session.user.id)
-        .single();
-      if (faculty) {
-        // Get advisor class name if advisor_class_id exists
-        let advisorClass = "";
-        if (faculty.advisor_class_id) {
-          const { data: classData } = await supabase
-            .from("classes")
-            .select("class_name")
-            .eq("id", faculty.advisor_class_id)
-            .single();
-          advisorClass = classData?.class_name || "";
-        }
-        setFacultyData({
-          name: faculty.full_name,
-          email: faculty.email,
-          isClassAdvisor: faculty.is_class_advisor,
-          advisorClass,
-          department: faculty.department
-        });
-      }
-      // Get today's classes for faculty
-      const today = new Date();
-      let dayOfWeek = today.getDay(); // 0=Sunday, 1=Monday, ...
-      // Our DB uses 1=Monday, ..., 6=Saturday. If Sunday, show empty schedule.
-      if (dayOfWeek === 0) {
-        setTodayClasses([]);
-        return;
-      }
-      // Get faculty details by user_id
-      const { data: facultyRow } = await supabase
-        .from("faculty")
-        .select("id")
-        .eq("user_id", data.session.user.id)
-        .single();
-      const facultyId = facultyRow?.id;
-      if (!facultyId) {
-        setTodayClasses([]);
-        return;
-      }
-      const { data: timetable } = await supabase
-        .from("timetable")
-        .select("period_number,class_id,subject")
-        .eq("faculty_id", facultyId)
-        .eq("day_of_week", dayOfWeek)
-        .order("period_number", { ascending: true });
-      // Get class names for each class_id
-      const classesWithNames = await Promise.all(
-        (timetable || []).map(async (item: any) => {
-          let className = "";
-          if (item.class_id) {
-            const { data: classData } = await supabase
-              .from("classes")
-              .select("class_name")
-              .eq("id", item.class_id)
-              .single();
-            className = classData?.class_name || "";
-          }
-          return {
-            period: item.period_number,
-            time: "", // Optionally format time from item.time
-            class: className,
-            subject: item.subject
-          };
-        })
-      );
-      setTodayClasses(classesWithNames);
-    });
-  }, [navigate]);
+  // Mock timetable
+  const todayClasses = [
+    { period: 1, time: "09:00 - 10:00", class: "2nd Year CSE B", subject: "Data Structures" },
+    { period: 3, time: "11:00 - 12:00", class: "3rd Year CSE A", subject: "Database Management" },
+    { period: 5, time: "02:00 - 03:00", class: "2nd Year CSE A", subject: "Data Structures" }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
@@ -110,7 +33,7 @@ const FacultyDashboard = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold">Faculty Portal</h1>
-              <p className="text-sm text-muted-foreground">Welcome, {facultyData?.name || "Faculty"}</p>
+              <p className="text-sm text-muted-foreground">Welcome, {facultyData.name}</p>
             </div>
           </div>
           <Button 
@@ -127,7 +50,7 @@ const FacultyDashboard = () => {
         <Tabs defaultValue="teaching" className="space-y-4">
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="teaching">Teaching Faculty</TabsTrigger>
-            <TabsTrigger value="advisor" disabled={!facultyData?.isClassAdvisor}>
+            <TabsTrigger value="advisor" disabled={!facultyData.isClassAdvisor}>
               Class Advisor
             </TabsTrigger>
           </TabsList>
@@ -171,7 +94,7 @@ const FacultyDashboard = () => {
             <Card className="shadow-medium">
               <div className="p-6 space-y-4">
                 <h2 className="text-2xl font-bold">Class Advisor Dashboard</h2>
-                <p className="text-muted-foreground">Managing: {facultyData?.advisorClass || ""}</p>
+                <p className="text-muted-foreground">Managing: {facultyData.advisorClass}</p>
                 
                 <div className="grid md:grid-cols-2 gap-4 pt-4">
                   <Button 
