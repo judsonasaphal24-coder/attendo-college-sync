@@ -2,9 +2,18 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LogOut, Users, GraduationCap, FileText, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        navigate("/admin-login");
+      }
+    });
+  }, [navigate]);
 
   const adminStats = [
     { label: "Total Students", value: "1,245", icon: GraduationCap, color: "gradient-primary" },
